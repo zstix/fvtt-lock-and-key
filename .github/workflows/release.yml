@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Package and Release
     runs-on: ubuntu-latest
     steps:
       - name: Chckout repository
@@ -21,7 +22,8 @@ jobs:
         id: get-version
         run: node ./.github/scripts/get-version.js
 
-      - name: Test
-        run: |
-          echo "Your version is"
-          echo ${{steps.get-version.outputs.version }}
+      - name: Zip files
+        run: zip -r ./module.zip ./src/*
+
+      - name: Create release
+        run: gh release create ${{ steps.get-version.outputs.version }} ./src/module.json ./module.zip

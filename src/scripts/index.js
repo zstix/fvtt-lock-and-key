@@ -9,8 +9,6 @@
 // LAK.ConfigKeyRemoveNotes
 
 // Next steps:
-// Save flags
-// Load flags
 // Associate inventory
 // User click event
 // Permissions and checks
@@ -18,7 +16,9 @@
 // Packaging
 
 const LAK = {
-  SCOPE: "LAK",
+  SCOPE: "lock-and-key",
+  BEBUG: "lockAndKeyDebug",
+  LOG_PREFIX: "Lock & Key  |",
   KEY_REQUIRED: "keyRequired",
   KEY_ITEM: "keyItem",
   KEY_REMOVE: "keyRemove",
@@ -30,9 +30,17 @@ const DEFAULTS = {
   [LAK.KEY_REMOVE]: true,
 };
 
-// TODO: initialize
+// window[LAK.DEBUG] = true;
+
+const init = () => {
+  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "init");
+
+  Hooks.once("renderWallConfig", injectLockAndKeyConfig);
+};
 
 const injectLockAndKeyConfig = (app, html, data) => {
+  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "injectLockAndKeyConfig");
+
   // Check if the user has permissions
   // Check if the wall is a door
   // Check if the tab is already added?
@@ -41,15 +49,16 @@ const injectLockAndKeyConfig = (app, html, data) => {
 };
 
 const getFlags = (id) => {
-  console.log("Lock & Key  | getFlags");
+  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "getFlags");
+
   const wall = canvas.walls.get(id);
 
   // If the wall has the scope, return what's stored
   if (LAK.SCOPE in wall.data.flags) {
     return {
-      keyRequired: object.getFlags(LAK.SCOPE, LAK.KEY_REQUIRED),
-      keyItem: object.getFlag(LAK.SCOPE, LAK.KEY_ITEM),
-      keyRemove: object.getFlag(LAK.SCOPE, LAK.KEY_REMOVE),
+      keyRequired: wall.getFlag(LAK.SCOPE, LAK.KEY_REQUIRED),
+      keyItem: wall.getFlag(LAK.SCOPE, LAK.KEY_ITEM),
+      keyRemove: wall.getFlag(LAK.SCOPE, LAK.KEY_REMOVE),
     };
   }
 
@@ -57,21 +66,28 @@ const getFlags = (id) => {
   return DEFAULTS;
 };
 
-// TODO: make work
-const handleSubmit = (html) => () => {
-  console.log("Lock & Key  | handleSubmit");
+const handleSubmit = (html, id) => () => {
+  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "handleSubmit");
+
+  const wall = canvas.walls.get(id);
+
+  // Get the values from the configuration UI
   const keyRequired = html.find('input[name="keyRequired"]').prop("checked");
   const keyItem = html.find('input[name="keyItem"]').prop("value");
   const keyRemove = html.find('input[name="keyRemove"]').prop("checked");
 
-  console.log({ keyRequired, keyItem, keyRemove });
+  // Save the values
+  wall.setFlag(LAK.SCOPE, LAK.KEY_REQUIRED, keyRequired);
+  wall.setFlag(LAK.SCOPE, LAK.KEY_ITEM, keyItem);
+  wall.setFlag(LAK.SCOPE, LAK.KEY_REMOVE, keyRemove);
 };
 
 const renderConfig = (app, html, data) => {
-  console.log("Lock & Key  | renderConfig");
+  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "renderConfig");
 
   // Load door state
-  const { keyRequired, keyItem, keyRemove } = getFlags(data.object._id);
+  const id = data.object._id;
+  const { keyRequired, keyItem, keyRemove } = getFlags(id);
 
   // Create the key configuration UI
   const keyConfigUI = `
@@ -101,7 +117,7 @@ const renderConfig = (app, html, data) => {
   html.find(".form-group").last().after(keyConfigUI);
 
   // Add event listener
-  html.find('button[type="submit"]').click(handleSubmit(html));
+  html.find('button[type="submit"]').click(handleSubmit(html, id));
 };
 
-Hooks.once("renderWallConfig", injectLockAndKeyConfig);
+Hooks.on('init', init);
