@@ -26,4 +26,4 @@ jobs:
         run: zip -r ./module.zip ./src/*
 
       - name: Create release
-        run: gh release create "v${{ steps.get-version.outputs.version }}" /module.zip
+        run: gh release create ${{ steps.get-version.outputs.version }} ./src/module.json ./module.zip
