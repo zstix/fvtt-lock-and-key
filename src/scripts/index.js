@@ -17,8 +17,7 @@
 
 const LAK = {
   SCOPE: "lock-and-key",
-  BEBUG: "lockAndKeyDebug",
-  LOG_PREFIX: "Lock & Key  |",
+  LOG_PREFIX: "Lock & Key |",
   KEY_REQUIRED: "keyRequired",
   KEY_ITEM: "keyItem",
   KEY_REMOVE: "keyRemove",
@@ -30,16 +29,14 @@ const DEFAULTS = {
   [LAK.KEY_REMOVE]: true,
 };
 
-// window[LAK.DEBUG] = true;
-
 const init = () => {
-  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "init");
+  console.log(LAK.LOG_PREFIX, "init");
 
   Hooks.once("renderWallConfig", injectLockAndKeyConfig);
 };
 
 const injectLockAndKeyConfig = (app, html, data) => {
-  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "injectLockAndKeyConfig");
+  console.log(LAK.LOG_PREFIX, "injectLockAndKeyConfig");
 
   // Check if the user has permissions
   // Check if the wall is a door
@@ -49,7 +46,7 @@ const injectLockAndKeyConfig = (app, html, data) => {
 };
 
 const getFlags = (id) => {
-  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "getFlags");
+  console.log(LAK.LOG_PREFIX, "getFlags");
 
   const wall = canvas.walls.get(id);
 
@@ -67,7 +64,7 @@ const getFlags = (id) => {
 };
 
 const handleSubmit = (html, id) => () => {
-  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "handleSubmit");
+  console.log(LAK.LOG_PREFIX, "handleSubmit");
 
   const wall = canvas.walls.get(id);
 
@@ -83,7 +80,7 @@ const handleSubmit = (html, id) => () => {
 };
 
 const renderConfig = (app, html, data) => {
-  window[LAK.DEBUG] && console.log(LAK.LOG_PREFIX, "renderConfig");
+  console.log(LAK.LOG_PREFIX, "renderConfig");
 
   // Load door state
   const id = data.object._id;
@@ -120,4 +117,4 @@ const renderConfig = (app, html, data) => {
   html.find('button[type="submit"]').click(handleSubmit(html, id));
 };
 
-Hooks.on('init', init);
+Hooks.on("init", init);
